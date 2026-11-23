@@ -72,4 +72,28 @@ class RentalServiceTest {
         assertThrows(DomainException.class, () -> service.rent("K1", "E1", today, today.plusDays(20)));
         assertEquals(EquipmentStatus.AVAILABLE, equipment.findById("E1").orElseThrow().status());
     }
+
+    @Test
+    void returnMakesEquipmentAvailableAndChargesFee() {
+        Rental rental = service.rent("K1", "E1", today, today.plusDays(2));
+
+        Money fee = service.returnEquipment(rental.id(), today.plusDays(2));
+
+        assertEquals(Money.of("50"), fee);
+        assertEquals(EquipmentStatus.AVAILABLE, equipment.findById("E1").orElseThrow().status());
+        assertEquals(List.of(), service.activeRentals());
+        assertEquals(List.of("rented W1", "returned W1 50.00 zł"), events);
+    }
+
+    @Test
+    void weekLongRentalGetsDiscount() {
+        Rental rental = service.rent("K1", "E1", today, today.plusDays(7));
+
+        assertEquals(Money.of("157.50"), service.returnEquipment(rental.id(), today.plusDays(7)));
+    }
+
+    @Test
+    void rejectsUnknownRental() {
+        assertThrows(NotFoundException.class, () -> service.returnEquipment("W9", today));
+    }
 }

@@ -6,10 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 import pl.wypozyczalnia.domain.Customer;
 import pl.wypozyczalnia.domain.Equipment;
+import pl.wypozyczalnia.domain.Money;
 import pl.wypozyczalnia.domain.NotFoundException;
 import pl.wypozyczalnia.domain.Rental;
 import pl.wypozyczalnia.domain.RentalPeriod;
 import pl.wypozyczalnia.domain.Repository;
+import pl.wypozyczalnia.domain.pricing.PricingPolicyFactory;
 import pl.wypozyczalnia.domain.rules.RentalRequest;
 import pl.wypozyczalnia.domain.rules.RentalRule;
 
@@ -51,6 +53,25 @@ public class RentalService {
         rentals.save(rental);
         listeners.forEach(listener -> listener.rented(rental));
         return rental;
+    }
+
+    public Money returnEquipment(String rentalId, LocalDate returnDate) {
+        Rental rental = rentals.findById(rentalId)
+                .orElseThrow(() -> new NotFoundException("wypożyczenie", rentalId));
+        Equipment item = equipment.findById(rental.equipmentId())
+                .orElseThrow(() -> new NotFoundException("sprzęt", rental.equipmentId()));
+
+        Money fee = rental.returnOn(returnDate, PricingPolicyFactory.forDays(rental.period().days()));
+        item.giveBack();
+
+        equipment.save(item);
+        rentals.save(rental);
+        listeners.forEach(listener -> listener.returned(rental, fee));
+        return fee;
+    }
+
+    public List<Rental> activeRentals() {
+        return rentals.findAll(Rental::isActive);
     }
 
     private String nextId() {
