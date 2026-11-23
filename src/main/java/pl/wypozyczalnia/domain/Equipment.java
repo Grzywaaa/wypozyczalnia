@@ -27,6 +27,14 @@ public class Equipment implements Entity {
         changeStatus(EquipmentStatus.RENTED, EquipmentStatus.AVAILABLE, "Sprzęt nie jest wypożyczony");
     }
 
+    public void sendToService() {
+        changeStatus(EquipmentStatus.AVAILABLE, EquipmentStatus.IN_SERVICE, "Do serwisu można oddać tylko dostępny sprzęt");
+    }
+
+    public void finishService() {
+        changeStatus(EquipmentStatus.IN_SERVICE, EquipmentStatus.AVAILABLE, "Sprzęt nie jest w serwisie");
+    }
+
     private void changeStatus(EquipmentStatus required, EquipmentStatus next, String error) {
         if (status != required) {
             throw new DomainException(error + ": " + name);

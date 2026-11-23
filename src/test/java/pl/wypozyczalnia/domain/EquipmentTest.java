@@ -34,6 +34,36 @@ class EquipmentTest {
     }
 
     @Test
+    void availableEquipmentCanBeSentToService() {
+        drill.sendToService();
+        assertEquals(EquipmentStatus.IN_SERVICE, drill.status());
+    }
+
+    @Test
+    void rentedEquipmentCannotBeSentToService() {
+        drill.rent();
+        assertThrows(DomainException.class, drill::sendToService);
+    }
+
+    @Test
+    void equipmentInServiceCannotBeRented() {
+        drill.sendToService();
+        assertThrows(DomainException.class, drill::rent);
+    }
+
+    @Test
+    void finishedServiceMakesEquipmentAvailable() {
+        drill.sendToService();
+        drill.finishService();
+        assertEquals(EquipmentStatus.AVAILABLE, drill.status());
+    }
+
+    @Test
+    void cannotFinishServiceOfEquipmentNotInService() {
+        assertThrows(DomainException.class, drill::finishService);
+    }
+
+    @Test
     void requiresName() {
         assertThrows(DomainException.class, () -> new Equipment("E2", " ", Money.of("10")));
     }
