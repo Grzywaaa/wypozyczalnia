@@ -1,5 +1,6 @@
 package pl.wypozyczalnia.domain;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
 import java.util.Optional;
@@ -10,6 +11,9 @@ import pl.wypozyczalnia.domain.pricing.PricingPolicy;
  * a opłatę można naliczyć tylko raz, przy zwrocie.
  */
 public class Rental implements Entity {
+
+    /** Każdy dzień spóźnienia kosztuje 150% stawki dziennej. */
+    private static final BigDecimal LATE_FEE_FACTOR = new BigDecimal("1.5");
 
     private final String id;
     private final String customerId;
@@ -34,7 +38,8 @@ public class Rental implements Entity {
         if (returnDate.isBefore(period.start())) {
             throw new DomainException("Data zwrotu nie może być wcześniejsza niż data odbioru");
         }
-        fee = pricing.price(dailyRate, period.days());
+        Money lateFee = dailyRate.times(LATE_FEE_FACTOR).times(period.daysLate(returnDate));
+        fee = pricing.price(dailyRate, period.days()).plus(lateFee);
         status = RentalStatus.RETURNED;
         return fee;
     }
