@@ -24,4 +24,32 @@ class RentalRulesTest {
     void blocksPeriodLongerThanMaximum() {
         assertThrows(DomainException.class, () -> new MaxPeriodRule(14).check(request(0, today, 15)));
     }
+
+    @Test
+    void allowsCustomerBelowLimit() {
+        new CustomerLimitRule(3).check(request(2, today, 1));
+    }
+
+    @Test
+    void blocksCustomerAtLimit() {
+        assertThrows(DomainException.class, () -> new CustomerLimitRule(3).check(request(3, today, 1)));
+    }
+
+    @Test
+    void allowsStartToday() {
+        new StartDateRule().check(request(0, today, 1));
+    }
+
+    @Test
+    void blocksStartInPast() {
+        assertThrows(DomainException.class, () -> new StartDateRule().check(request(0, today.minusDays(1), 1)));
+    }
+
+    @Test
+    void chainChecksEveryRule() {
+        RentalRule chain = new StartDateRule();
+        chain.then(new MaxPeriodRule(14)).then(new CustomerLimitRule(3));
+
+        assertThrows(DomainException.class, () -> chain.check(request(3, today, 1)));
+    }
 }
