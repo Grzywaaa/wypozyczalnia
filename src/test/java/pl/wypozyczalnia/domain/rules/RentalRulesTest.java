@@ -46,10 +46,12 @@ class RentalRulesTest {
     }
 
     @Test
-    void chainChecksEveryRule() {
-        RentalRule chain = new StartDateRule();
-        chain.then(new MaxPeriodRule(14)).then(new CustomerLimitRule(3));
+    void standardChainChecksEveryRule() {
+        RentalRule chain = RentalRules.standard();
 
+        chain.check(request(2, today, 14));
+        assertThrows(DomainException.class, () -> chain.check(request(0, today.minusDays(1), 1)));
+        assertThrows(DomainException.class, () -> chain.check(request(0, today, 15)));
         assertThrows(DomainException.class, () -> chain.check(request(3, today, 1)));
     }
 }
