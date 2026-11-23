@@ -4,8 +4,10 @@ import java.io.PrintStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.Scanner;
+import pl.wypozyczalnia.application.CustomerService;
 import pl.wypozyczalnia.application.EquipmentService;
 import pl.wypozyczalnia.application.RentalService;
+import pl.wypozyczalnia.domain.Customer;
 import pl.wypozyczalnia.domain.DomainException;
 import pl.wypozyczalnia.domain.Equipment;
 import pl.wypozyczalnia.domain.Rental;
@@ -21,18 +23,22 @@ public class ConsoleApp {
             4. Aktywne wypożyczenia
             5. Oddaj sprzęt do serwisu
             6. Zakończ serwis sprzętu
+            7. Lista klientów
             0. Koniec""";
 
     private final Scanner in;
     private final PrintStream out;
     private final RentalService rentals;
     private final EquipmentService equipment;
+    private final CustomerService customers;
 
-    public ConsoleApp(Scanner in, PrintStream out, RentalService rentals, EquipmentService equipment) {
+    public ConsoleApp(Scanner in, PrintStream out, RentalService rentals, EquipmentService equipment,
+                      CustomerService customers) {
         this.in = in;
         this.out = out;
         this.rentals = rentals;
         this.equipment = equipment;
+        this.customers = customers;
     }
 
     public void run() {
@@ -71,6 +77,7 @@ public class ConsoleApp {
                 equipment.finishService(ask("Id sprzętu"));
                 out.println("Sprzęt ponownie dostępny");
             }
+            case "7" -> customers.allCustomers().forEach(this::print);
             default -> out.println("Nieznana opcja");
         }
     }
@@ -86,6 +93,10 @@ public class ConsoleApp {
 
     private void print(Equipment item) {
         out.println(item.id() + "  " + item.name() + "  " + item.dailyRate() + "/dzień  " + item.status());
+    }
+
+    private void print(Customer customer) {
+        out.println(customer.id() + "  " + customer.name());
     }
 
     private void print(Rental rental) {

@@ -2,6 +2,7 @@ package pl.wypozyczalnia.ui;
 
 import java.time.Clock;
 import java.util.Scanner;
+import pl.wypozyczalnia.application.CustomerService;
 import pl.wypozyczalnia.application.EquipmentService;
 import pl.wypozyczalnia.application.RentalService;
 import pl.wypozyczalnia.domain.Customer;
@@ -28,7 +29,8 @@ public final class Main {
                 Clock.systemDefaultZone());
         rentalService.addListener(new ConsoleNotifier(System.out));
 
-        new ConsoleApp(new Scanner(System.in), System.out, rentalService, new EquipmentService(equipment)).run();
+        new ConsoleApp(new Scanner(System.in), System.out, rentalService, new EquipmentService(equipment),
+                new CustomerService(customers)).run();
     }
 
     private static void addSampleData(InMemoryRepository<Equipment> equipment,
