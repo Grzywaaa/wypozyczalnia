@@ -2,7 +2,6 @@ package pl.wypozyczalnia.application;
 
 import java.util.List;
 import pl.wypozyczalnia.domain.Equipment;
-import pl.wypozyczalnia.domain.NotFoundException;
 import pl.wypozyczalnia.domain.Repository;
 
 /** Przypadki użycia: przegląd sprzętu oraz obsługa serwisu. */
@@ -19,18 +18,14 @@ public class EquipmentService {
     }
 
     public void sendToService(String equipmentId) {
-        Equipment item = find(equipmentId);
+        Equipment item = equipment.require(equipmentId, "sprzęt");
         item.sendToService();
         equipment.save(item);
     }
 
     public void finishService(String equipmentId) {
-        Equipment item = find(equipmentId);
+        Equipment item = equipment.require(equipmentId, "sprzęt");
         item.finishService();
         equipment.save(item);
-    }
-
-    private Equipment find(String equipmentId) {
-        return equipment.findById(equipmentId).orElseThrow(() -> new NotFoundException("sprzęt", equipmentId));
     }
 }

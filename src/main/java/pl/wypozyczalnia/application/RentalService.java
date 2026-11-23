@@ -7,7 +7,6 @@ import java.util.List;
 import pl.wypozyczalnia.domain.Customer;
 import pl.wypozyczalnia.domain.Equipment;
 import pl.wypozyczalnia.domain.Money;
-import pl.wypozyczalnia.domain.NotFoundException;
 import pl.wypozyczalnia.domain.Rental;
 import pl.wypozyczalnia.domain.RentalPeriod;
 import pl.wypozyczalnia.domain.Repository;
@@ -39,9 +38,8 @@ public class RentalService {
     }
 
     public Rental rent(String customerId, String equipmentId, LocalDate start, LocalDate end) {
-        customers.findById(customerId).orElseThrow(() -> new NotFoundException("klient", customerId));
-        Equipment item = equipment.findById(equipmentId)
-                .orElseThrow(() -> new NotFoundException("sprzęt", equipmentId));
+        customers.require(customerId, "klient");
+        Equipment item = equipment.require(equipmentId, "sprzęt");
         RentalPeriod period = new RentalPeriod(start, end);
         long active = rentals.findAll(rental -> rental.isActiveFor(customerId)).size();
 
@@ -56,10 +54,8 @@ public class RentalService {
     }
 
     public Money returnEquipment(String rentalId, LocalDate returnDate) {
-        Rental rental = rentals.findById(rentalId)
-                .orElseThrow(() -> new NotFoundException("wypożyczenie", rentalId));
-        Equipment item = equipment.findById(rental.equipmentId())
-                .orElseThrow(() -> new NotFoundException("sprzęt", rental.equipmentId()));
+        Rental rental = rentals.require(rentalId, "wypożyczenie");
+        Equipment item = equipment.require(rental.equipmentId(), "sprzęt");
 
         Money fee = rental.returnOn(returnDate, PricingPolicyFactory.forDays(rental.period().days()));
         item.giveBack();
