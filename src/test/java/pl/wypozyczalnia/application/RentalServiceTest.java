@@ -17,10 +17,7 @@ import pl.wypozyczalnia.domain.EquipmentStatus;
 import pl.wypozyczalnia.domain.Money;
 import pl.wypozyczalnia.domain.NotFoundException;
 import pl.wypozyczalnia.domain.Rental;
-import pl.wypozyczalnia.domain.rules.CustomerLimitRule;
-import pl.wypozyczalnia.domain.rules.MaxPeriodRule;
-import pl.wypozyczalnia.domain.rules.RentalRule;
-import pl.wypozyczalnia.domain.rules.StartDateRule;
+import pl.wypozyczalnia.domain.rules.RentalRules;
 import pl.wypozyczalnia.infrastructure.InMemoryRepository;
 
 class RentalServiceTest {
@@ -37,11 +34,9 @@ class RentalServiceTest {
         customers.save(new Customer("K1", "Jan Kowalski"));
         equipment.save(new Equipment("E1", "Wiertarka", Money.of("25")));
 
-        RentalRule rules = new StartDateRule();
-        rules.then(new MaxPeriodRule(14)).then(new CustomerLimitRule(3));
         Clock clock = Clock.fixed(today.atStartOfDay().toInstant(ZoneOffset.UTC), ZoneOffset.UTC);
 
-        service = new RentalService(equipment, customers, rentals, rules, clock);
+        service = new RentalService(equipment, customers, rentals, RentalRules.standard(), clock);
         service.addListener(new RentalListener() {
             public void rented(Rental rental) {
                 events.add("rented " + rental.id());

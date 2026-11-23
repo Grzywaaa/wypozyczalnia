@@ -15,10 +15,7 @@ import pl.wypozyczalnia.domain.Equipment;
 import pl.wypozyczalnia.domain.EquipmentStatus;
 import pl.wypozyczalnia.domain.Money;
 import pl.wypozyczalnia.domain.Rental;
-import pl.wypozyczalnia.domain.rules.CustomerLimitRule;
-import pl.wypozyczalnia.domain.rules.MaxPeriodRule;
-import pl.wypozyczalnia.domain.rules.RentalRule;
-import pl.wypozyczalnia.domain.rules.StartDateRule;
+import pl.wypozyczalnia.domain.rules.RentalRules;
 import pl.wypozyczalnia.infrastructure.InMemoryRepository;
 
 /** Scenariusze BDD opisane w dokumentacji. */
@@ -36,11 +33,10 @@ class RentalScenariosTest {
         for (int i = 1; i <= 4; i++) {
             equipment.save(new Equipment("E" + i, "Sprzęt " + i, Money.of("25")));
         }
-        RentalRule rules = new StartDateRule();
-        rules.then(new MaxPeriodRule(14)).then(new CustomerLimitRule(3));
         Clock clock = Clock.fixed(today.atStartOfDay().toInstant(ZoneOffset.UTC), ZoneOffset.UTC);
 
-        rentalService = new RentalService(equipment, customers, new InMemoryRepository<>(), rules, clock);
+        rentalService = new RentalService(equipment, customers, new InMemoryRepository<>(),
+                RentalRules.standard(), clock);
         equipmentService = new EquipmentService(equipment);
     }
 

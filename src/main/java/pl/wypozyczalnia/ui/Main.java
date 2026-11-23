@@ -8,10 +8,7 @@ import pl.wypozyczalnia.domain.Customer;
 import pl.wypozyczalnia.domain.Equipment;
 import pl.wypozyczalnia.domain.Money;
 import pl.wypozyczalnia.domain.Rental;
-import pl.wypozyczalnia.domain.rules.CustomerLimitRule;
-import pl.wypozyczalnia.domain.rules.MaxPeriodRule;
-import pl.wypozyczalnia.domain.rules.RentalRule;
-import pl.wypozyczalnia.domain.rules.StartDateRule;
+import pl.wypozyczalnia.domain.rules.RentalRules;
 import pl.wypozyczalnia.infrastructure.InMemoryRepository;
 
 /** Punkt startowy: ręczne tworzenie i łączenie obiektów (bez kontenera DI). */
@@ -26,10 +23,8 @@ public final class Main {
         InMemoryRepository<Rental> rentals = new InMemoryRepository<>();
         addSampleData(equipment, customers);
 
-        RentalRule rules = new StartDateRule();
-        rules.then(new MaxPeriodRule(14)).then(new CustomerLimitRule(3));
 
-        RentalService rentalService = new RentalService(equipment, customers, rentals, rules,
+        RentalService rentalService = new RentalService(equipment, customers, rentals, RentalRules.standard(),
                 Clock.systemDefaultZone());
         rentalService.addListener(new ConsoleNotifier(System.out));
 
