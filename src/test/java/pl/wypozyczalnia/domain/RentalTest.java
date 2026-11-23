@@ -24,6 +24,13 @@ class RentalTest {
     }
 
     @Test
+    void lateReturnAddsOneAndHalfDailyRateForEachDayLate() {
+        Money fee = rental.returnOn(start.plusDays(5), new StandardPricing());
+
+        assertEquals(Money.of("150"), fee);
+    }
+
+    @Test
     void cannotReturnTwice() {
         rental.returnOn(start.plusDays(3), new StandardPricing());
 
