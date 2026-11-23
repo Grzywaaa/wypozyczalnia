@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import pl.wypozyczalnia.domain.Entity;
+import pl.wypozyczalnia.domain.NotFoundException;
 
 class InMemoryRepositoryTest {
 
@@ -24,6 +25,12 @@ class InMemoryRepositoryTest {
     @Test
     void returnsEmptyOptionalForUnknownId() {
         assertTrue(repository.findById("X").isEmpty());
+    }
+
+    @Test
+    void requireThrowsNotFoundForUnknownId() {
+        NotFoundException error = assertThrows(NotFoundException.class, () -> repository.require("X", "element"));
+        assertEquals("Nie znaleziono: element X", error.getMessage());
     }
 
     @Test

@@ -13,6 +13,11 @@ public interface Repository<T extends Entity> {
 
     List<T> findAll();
 
+    /** Zwraca encję albo rzuca NotFoundException z czytelnym opisem, czego zabrakło. */
+    default T require(String id, String what) {
+        return findById(id).orElseThrow(() -> new NotFoundException(what, id));
+    }
+
     default List<T> findAll(Predicate<? super T> condition) {
         return findAll().stream().filter(condition).toList();
     }
