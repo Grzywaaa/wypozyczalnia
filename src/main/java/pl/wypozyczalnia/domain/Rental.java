@@ -39,7 +39,7 @@ public class Rental implements Entity {
             throw new DomainException("Data zwrotu nie może być wcześniejsza niż data odbioru");
         }
         Money lateFee = dailyRate.times(LATE_FEE_FACTOR).times(period.daysLate(returnDate));
-        fee = pricing.price(dailyRate, period.days()).plus(lateFee);
+        fee = pricing.price(dailyRate, period.chargedDays(returnDate)).plus(lateFee);
         status = RentalStatus.RETURNED;
         return fee;
     }

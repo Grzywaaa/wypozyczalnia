@@ -19,6 +19,12 @@ public record RentalPeriod(LocalDate start, LocalDate end) {
         return ChronoUnit.DAYS.between(start, end);
     }
 
+    /** Dni do zapłaty: faktycznie wykorzystane, co najmniej jeden, najwyżej zarezerwowane (resztę liczy opłata za spóźnienie). */
+    public long chargedDays(LocalDate returnDate) {
+        long used = ChronoUnit.DAYS.between(start, returnDate);
+        return Math.min(days(), Math.max(1, used));
+    }
+
     public long daysLate(LocalDate returnDate) {
         return Math.max(0, ChronoUnit.DAYS.between(end, returnDate));
     }

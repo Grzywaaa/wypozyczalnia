@@ -21,6 +21,24 @@ class RentalPeriodTest {
     }
 
     @Test
+    void chargesOnlyDaysActuallyUsedWhenReturnedEarly() {
+        RentalPeriod period = new RentalPeriod(monday, monday.plusDays(6));
+        assertEquals(2, period.chargedDays(monday.plusDays(2)));
+    }
+
+    @Test
+    void chargesAtLeastOneDayWhenReturnedSameDay() {
+        RentalPeriod period = new RentalPeriod(monday, monday.plusDays(6));
+        assertEquals(1, period.chargedDays(monday));
+    }
+
+    @Test
+    void chargesAtMostPlannedDaysWhenReturnedLate() {
+        RentalPeriod period = new RentalPeriod(monday, monday.plusDays(3));
+        assertEquals(3, period.chargedDays(monday.plusDays(5)));
+    }
+
+    @Test
     void countsDaysLateOnlyAfterEnd() {
         RentalPeriod period = new RentalPeriod(monday, monday.plusDays(3));
         assertEquals(0, period.daysLate(monday.plusDays(2)));
