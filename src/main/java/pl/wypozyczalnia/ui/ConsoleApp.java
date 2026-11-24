@@ -63,8 +63,14 @@ public class ConsoleApp {
             case "3" -> out.println("Do zapłaty: "
                     + rentals.returnEquipment(ask("Nr wypożyczenia"), askDate("Data zwrotu")));
             case "4" -> rentals.activeRentals().forEach(this::print);
-            case "5" -> equipment.sendToService(ask("Id sprzętu"));
-            case "6" -> equipment.finishService(ask("Id sprzętu"));
+            case "5" -> {
+                equipment.sendToService(ask("Id sprzętu"));
+                out.println("Sprzęt przekazany do serwisu");
+            }
+            case "6" -> {
+                equipment.finishService(ask("Id sprzętu"));
+                out.println("Sprzęt ponownie dostępny");
+            }
             default -> out.println("Nieznana opcja");
         }
     }
