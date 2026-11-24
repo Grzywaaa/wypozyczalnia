@@ -1,6 +1,7 @@
 package pl.wypozyczalnia.ui;
 
 import java.time.Clock;
+import java.util.List;
 import java.util.Scanner;
 import pl.wypozyczalnia.application.CustomerService;
 import pl.wypozyczalnia.application.EquipmentService;
@@ -19,11 +20,14 @@ public final class Main {
     }
 
     public static void main(String[] args) {
-        InMemoryRepository<Equipment> equipment = new InMemoryRepository<>();
-        InMemoryRepository<Customer> customers = new InMemoryRepository<>();
+        InMemoryRepository<Equipment> equipment = InMemoryRepository.of(List.of(
+                new Equipment("E1", "Wiertarka udarowa", Money.of("25")),
+                new Equipment("E2", "Rower górski", Money.of("60")),
+                new Equipment("E3", "Namiot czteroosobowy", Money.of("40"))));
+        InMemoryRepository<Customer> customers = InMemoryRepository.of(List.of(
+                new Customer("K1", "Jan Kowalski"),
+                new Customer("K2", "Anna Nowak")));
         InMemoryRepository<Rental> rentals = new InMemoryRepository<>();
-        addSampleData(equipment, customers);
-
 
         RentalService rentalService = new RentalService(equipment, customers, rentals, RentalRules.standard(),
                 Clock.systemDefaultZone());
@@ -31,14 +35,5 @@ public final class Main {
 
         new ConsoleApp(new Scanner(System.in), System.out, rentalService, new EquipmentService(equipment),
                 new CustomerService(customers)).run();
-    }
-
-    private static void addSampleData(InMemoryRepository<Equipment> equipment,
-                                      InMemoryRepository<Customer> customers) {
-        equipment.save(new Equipment("E1", "Wiertarka udarowa", Money.of("25")));
-        equipment.save(new Equipment("E2", "Rower górski", Money.of("60")));
-        equipment.save(new Equipment("E3", "Namiot czteroosobowy", Money.of("40")));
-        customers.save(new Customer("K1", "Jan Kowalski"));
-        customers.save(new Customer("K2", "Anna Nowak"));
     }
 }
