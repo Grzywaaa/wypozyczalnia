@@ -96,4 +96,17 @@ class RentalScenariosTest {
         // then
         assertEquals(Money.of("157.50"), fee);
     }
+
+    @Test
+    @DisplayName("Wcześniejszy zwrot kosztuje tylko za dni faktycznie wykorzystane")
+    void earlyReturnIsChargedForDaysActuallyUsed() {
+        // given
+        Rental rental = rentalService.rent("K1", "E1", today, today.plusDays(6));
+
+        // when
+        Money fee = rentalService.returnEquipment(rental.id(), today.plusDays(2));
+
+        // then
+        assertEquals(Money.of("50"), fee);
+    }
 }

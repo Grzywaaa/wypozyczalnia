@@ -57,7 +57,7 @@ public class RentalService {
         Rental rental = rentals.require(rentalId, "wypożyczenie");
         Equipment item = equipment.require(rental.equipmentId(), "sprzęt");
 
-        Money fee = rental.returnOn(returnDate, PricingPolicyFactory.forDays(rental.period().days()));
+        Money fee = rental.returnOn(returnDate, PricingPolicyFactory.forDays(rental.period().chargedDays(returnDate)));
         item.giveBack();
 
         equipment.save(item);

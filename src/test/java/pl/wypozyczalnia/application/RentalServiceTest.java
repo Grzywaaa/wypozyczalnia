@@ -88,6 +88,13 @@ class RentalServiceTest {
     }
 
     @Test
+    void earlyReturnOfWeekLongRentalLosesDiscount() {
+        Rental rental = service.rent("K1", "E1", today, today.plusDays(7));
+
+        assertEquals(Money.of("75"), service.returnEquipment(rental.id(), today.plusDays(3)));
+    }
+
+    @Test
     void rejectsUnknownRental() {
         assertThrows(NotFoundException.class, () -> service.returnEquipment("W9", today));
     }
