@@ -62,19 +62,19 @@ public class ConsoleApp {
         switch (choice) {
             case "1" -> equipment.allEquipment().forEach(this::print);
             case "2" -> {
-                Rental rental = rentals.rent(ask("Id klienta"), ask("Id sprzętu"),
+                Rental rental = rentals.rent(ask("Id klienta (np. K1)"), ask("Id sprzętu (np. E1)"),
                         askDate("Data odbioru"), askDate("Data zwrotu"));
                 out.println("Utworzono wypożyczenie " + rental.id());
             }
             case "3" -> out.println("Do zapłaty: "
-                    + rentals.returnEquipment(ask("Nr wypożyczenia"), askDate("Data zwrotu")));
+                    + rentals.returnEquipment(ask("Nr wypożyczenia (np. W1)"), askDate("Data zwrotu")));
             case "4" -> rentals.activeRentals().forEach(this::print);
             case "5" -> {
-                equipment.sendToService(ask("Id sprzętu"));
+                equipment.sendToService(ask("Id sprzętu (np. E1)"));
                 out.println("Sprzęt przekazany do serwisu");
             }
             case "6" -> {
-                equipment.finishService(ask("Id sprzętu"));
+                equipment.finishService(ask("Id sprzętu (np. E1)"));
                 out.println("Sprzęt ponownie dostępny");
             }
             case "7" -> customers.allCustomers().forEach(this::print);
