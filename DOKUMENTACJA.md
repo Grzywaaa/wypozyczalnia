@@ -18,9 +18,10 @@ Aplikacja obsługuje małą wypożyczalnię sprzętu (narzędzia, rowery, sprzę
 * R5: wypożyczyć można tylko sprzęt dostępny, nie wypożyczony i nie w serwisie (`Equipment.rent`).
 
 **PU2. Zwróć sprzęt** (`RentalService.returnEquipment`)
-* R6: wypożyczenie na 7 dni lub dłużej ma 10% rabatu (`PricingPolicyFactory`, `WeeklyDiscountPricing`),
+* R6: wypożyczenie faktycznie trwające 7 dni lub dłużej ma 10% rabatu (`PricingPolicyFactory`, `WeeklyDiscountPricing`),
 * R7: każdy dzień spóźnienia kosztuje 150% stawki dziennej (`Rental.returnOn`),
-* R8: wypożyczenie można zakończyć tylko raz, a data zwrotu nie może poprzedzać daty odbioru (`Rental.returnOn`).
+* R8: wypożyczenie można zakończyć tylko raz, a data zwrotu nie może poprzedzać daty odbioru (`Rental.returnOn`),
+* R8a: przy wcześniejszym zwrocie klient płaci tylko za dni faktycznie wykorzystane, co najmniej za jeden dzień (`RentalPeriod.chargedDays`).
 
 **PU3. Obsłuż serwis sprzętu** (`EquipmentService`)
 * R9: do serwisu można oddać tylko sprzęt dostępny (`Equipment.sendToService`),
@@ -67,6 +68,11 @@ Testy: `src/test/java/pl/wypozyczalnia/application/RentalScenariosTest.java`
 * Gdy zwraca go w terminie,
 * Wtedy płaci 157,50 zł, czyli cenę z 10% rabatem.
 
+**S5. Wcześniejszy zwrot** (`earlyReturnIsChargedForDaysActuallyUsed`)
+* Zakładając, że klient wypożyczył sprzęt za 25 zł dziennie na 6 dni,
+* Gdy zwraca go już po 2 dniach,
+* Wtedy płaci 50 zł, czyli tylko za 2 wykorzystane dni.
+
 ## 2. Struktura projektu
 
 **[ZRZUT EKRANU drzewa pakietów z IDE, opcjonalnie diagram klas]**
@@ -90,7 +96,7 @@ Domena nie importuje żadnej innej warstwy. Obiekty tworzone są ręcznie w `Mai
 | DDD: encje | `Equipment`, `Customer` | e1beeb3, 15c5d1b | Mają tożsamość (`id`) i stan zmieniający się w czasie. |
 | DDD: agregat | `Rental`, `Equipment` | b9e4319, 04478b1 | `Rental` sam nalicza opłatę i blokuje drugi zwrot; `Equipment` pozwala tylko na dozwolone zmiany stanu. Pól nie da się zmienić z zewnątrz. |
 | DDD: repozytorium | `Repository` (domena), `InMemoryRepository` (infrastruktura) | dd8fd39, 699321e | Domena zna tylko interfejs, przechowywanie w pamięci jest szczegółem infrastruktury. |
-| BDD | `RentalScenariosTest` | 858a4ba | Cztery scenariusze z sekcji 1, każdy test podzielony na given, when, then. |
+| BDD | `RentalScenariosTest` | 858a4ba, 157765c | Pięć scenariuszy z sekcji 1, każdy test podzielony na given, when, then. |
 | TDD | `RentalTest`, `Rental` | 66fba5b, 04478b1 | Najpierw test opłaty za spóźnienie, który nie przechodził, potem implementacja. |
 | S: pojedyncza odpowiedzialność | `RentalService`, `ConsoleApp`, `Money` | e88396d, f53f360 | Serwis tylko koordynuje przypadek użycia, reguły są w domenie, a `ConsoleApp` tylko czyta dane i wypisuje wyniki. |
 | O: otwarte/zamknięte | `RentalRule`, `PricingPolicy` | e5a01b7, 9fc611d | Nową regułę lub cennik dodaje się nową klasą, bez zmiany `RentalService` ani `Rental`. |
