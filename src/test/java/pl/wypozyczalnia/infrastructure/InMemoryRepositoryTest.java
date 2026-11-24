@@ -46,4 +46,25 @@ class InMemoryRepositoryTest {
         repository.save(new Item("B"));
         assertEquals(List.of(new Item("B")), repository.findAll(item -> item.id().equals("B")));
     }
+
+    @Test
+    void createsRepositoryFilledWithGivenEntities() {
+        // given
+        List<Item> items = List.of(new Item("A"), new Item("B"));
+
+        // when
+        InMemoryRepository<Item> filled = InMemoryRepository.of(items);
+
+        // then
+        assertEquals(items, filled.findAll());
+    }
+
+    @Test
+    void createsEmptyRepositoryFromEmptyList() {
+        // when
+        InMemoryRepository<Item> empty = InMemoryRepository.of(List.<Item>of());
+
+        // then
+        assertTrue(empty.findAll().isEmpty());
+    }
 }

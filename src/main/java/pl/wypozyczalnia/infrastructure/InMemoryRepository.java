@@ -12,6 +12,13 @@ public class InMemoryRepository<T extends Entity> implements Repository<T> {
 
     private final Map<String, T> items = new LinkedHashMap<>();
 
+    /** Metoda generyczna: tworzy repozytorium dowolnego typu encji wypełnione podanymi elementami. */
+    public static <E extends Entity> InMemoryRepository<E> of(List<E> entities) {
+        InMemoryRepository<E> repository = new InMemoryRepository<>();
+        entities.forEach(repository::save);
+        return repository;
+    }
+
     @Override
     public void save(T entity) {
         items.put(entity.id(), entity);
